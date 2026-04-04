@@ -674,10 +674,10 @@ ${serviceMsg}
             </Link>
             
             <div className="hidden md:flex items-center space-x-8">
-              {['服务项目', '关于我们', '核心优势', '客户评价'].map((item, i) => (
+              {['服务项目', '核心优势', '客户评价'].map((item, i) => (
                 <motion.a 
                   key={item}
-                  href={`#${['services', 'about', 'features', 'testimonials'][i]}`}
+                  href={`#${['services', 'features', 'testimonials'][i]}`}
                   className="nav-link"
                   whileHover={{ y: -2 }}
                 >
@@ -997,7 +997,7 @@ ${serviceMsg}
             <div>
               <h4 className="text-white font-semibold mb-4">快速链接</h4>
               <ul className="space-y-3">
-                {['关于我们', '服务项目', '案例展示', '联系我们'].map((item) => (
+                {['服务项目', '案例展示', '联系我们'].map((item) => (
                   <li key={item}>
                     <Link href="#" className="text-gray-500 hover:text-white transition-colors text-sm">
                       {item}
