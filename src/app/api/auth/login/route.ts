@@ -17,7 +17,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const user = await prisma.user.findFirst({
+    // 设置数据库查询超时
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('数据库连接超时')), 8000)
+    )
+
+    const userPromise = prisma.user.findFirst({
       where: {
         OR: [
           { username },
@@ -25,6 +30,8 @@ export async function POST(request: NextRequest) {
         ]
       }
     })
+
+    const user = await Promise.race([userPromise, timeoutPromise]) as any
 
     if (!user) {
       return NextResponse.json(
@@ -58,10 +65,19 @@ export async function POST(request: NextRequest) {
         phone: user.phone,
       },
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('登录错误:', error)
+    
+    // 如果是超时错误，返回更友好的提示
+    if (error?.message?.includes('timeout') || error?.message?.includes('超时')) {
+      return NextResponse.json(
+        { error: '服务器响应超时，请稍后重试' },
+        { status: 503 }
+      )
+    }
+    
     return NextResponse.json(
-      { error: '服务器错误' },
+      { error: '服务器错误，请稍后重试' },
       { status: 500 }
     )
   }
