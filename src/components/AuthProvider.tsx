@@ -25,14 +25,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
-  // 验证 token 是否有效
+  // 验证 token 是否有效（带超时）
   const verifyToken = async (token: string): Promise<boolean> => {
     try {
-      const res = await fetch('/api/user/profile', {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5秒超时
+      
+      const res = await fetch('/api/auth/verify', {
         headers: {
           'Authorization': `Bearer ${token}`
-        }
+        },
+        signal: controller.signal
       })
+      clearTimeout(timeoutId)
       return res.ok
     } catch {
       return false
