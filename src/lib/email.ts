@@ -322,15 +322,16 @@ export async function sendVerificationEmail(email: string, code: string) {
     })
 
     if (error) {
-      console.error('Resend 发送邮件失败:', error)
-      return { success: false, error }
+      console.error('Resend 发送邮件失败:', JSON.stringify(error))
+      return { success: false, error: error.message || '邮件发送失败' }
     }
 
     console.log('邮件发送成功:', data)
     return { success: true, data }
   } catch (error) {
-    console.error('发送邮件失败:', error)
-    return { success: false, error }
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('发送邮件异常:', errorMessage, error)
+    return { success: false, error: errorMessage || '邮件发送异常' }
   }
 }
 

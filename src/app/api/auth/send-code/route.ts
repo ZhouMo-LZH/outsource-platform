@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     if (!emailResult.success) {
       console.error('邮件发送失败详情:', emailResult.error)
       return NextResponse.json(
-        { error: '验证码发送失败，请稍后重试' },
+        { error: `验证码发送失败: ${emailResult.error}` },
         { status: 500 }
       )
     }
