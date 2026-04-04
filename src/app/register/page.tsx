@@ -130,7 +130,7 @@ export default function RegisterPage() {
       const data = await res.json()
 
       if (res.ok) {
-        router.push('/login?registered=true')
+        window.location.href = '/login?registered=true'
       } else {
         setError(data.error || '注册失败')
       }

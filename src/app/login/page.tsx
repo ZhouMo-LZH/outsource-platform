@@ -71,10 +71,8 @@ export default function LoginPage() {
         // 调用 login 函数更新状态
         login(data.token, data.user)
         
-        // 延迟跳转，确保状态更新完成
-        setTimeout(() => {
-          router.push('/')
-        }, 100)
+        // 使用 window.location 跳转，避免框架问题
+        window.location.href = '/'
       } else {
         setError(data.error || '登录失败')
       }
