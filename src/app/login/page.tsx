@@ -64,12 +64,22 @@ export default function LoginPage() {
       const data = await res.json()
       
       if (res.ok) {
+        // 先保存到 localStorage
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        
+        // 调用 login 函数更新状态
         login(data.token, data.user)
-        router.push('/')
+        
+        // 延迟跳转，确保状态更新完成
+        setTimeout(() => {
+          router.push('/')
+        }, 100)
       } else {
         setError(data.error || '登录失败')
       }
-    } catch {
+    } catch (err) {
+      console.error('登录错误:', err)
       setError('网络错误，请重试')
     } finally {
       setLoading(false)

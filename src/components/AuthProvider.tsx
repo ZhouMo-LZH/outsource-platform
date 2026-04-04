@@ -47,23 +47,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 初始化时检查登录状态
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('token')
-      const userData = localStorage.getItem('user')
+      try {
+        const token = localStorage.getItem('token')
+        const userData = localStorage.getItem('user')
 
-      if (token && userData) {
-        // 验证 token 是否仍然有效
-        const isValid = await verifyToken(token)
-        
-        if (isValid) {
-          setUser(JSON.parse(userData))
-        } else {
-          // token 已过期，清除本地存储
-          localStorage.removeItem('token')
-          localStorage.removeItem('user')
+        if (token && userData) {
+          try {
+            // 验证 token 是否仍然有效
+            const isValid = await verifyToken(token)
+            
+            if (isValid) {
+              setUser(JSON.parse(userData))
+            } else {
+              // token 已过期，清除本地存储
+              localStorage.removeItem('token')
+              localStorage.removeItem('user')
+            }
+          } catch (verifyError) {
+            // 验证失败但不清除，可能是网络问题
+            console.log('Token 验证失败:', verifyError)
+            // 仍然使用本地数据，让用户可以访问
+            setUser(JSON.parse(userData))
+          }
         }
+      } catch (error) {
+        console.error('初始化认证失败:', error)
+      } finally {
+        setLoading(false)
       }
-      
-      setLoading(false)
     }
 
     initAuth()
