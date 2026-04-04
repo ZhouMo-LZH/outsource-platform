@@ -3,12 +3,11 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { 
   Code, GraduationCap, Palette, Rocket, Shield, MessageCircle, 
-  ChevronRight, Star, Zap, ArrowRight, Sparkles, Cpu, Globe,
-  TrendingUp, Clock, Award, CheckCircle2, Users, Lightbulb,
-  Target, Heart, Mail, Phone, MapPin, Github, Twitter, Linkedin,
+  ChevronRight, Star, Zap, ArrowRight, Sparkles,
+  Target, Heart, Mail, Phone, MapPin,
   X, Loader2, User
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'
@@ -171,109 +170,6 @@ function AnimatedCounter({ value, suffix = '' }: { value: string; suffix?: strin
   }, [isVisible, numericValue])
   
   return <span ref={ref}>{count}{suffixText}{suffix}</span>
-}
-
-// Particle Background Component
-function ParticleBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    
-    let animationId: number
-    let particles: Array<{
-      x: number
-      y: number
-      vx: number
-      vy: number
-      size: number
-      opacity: number
-      color: string
-    }> = []
-    
-    const colors = ['rgba(14, 165, 233,', 'rgba(168, 85, 247,', 'rgba(56, 189, 248,']
-    
-    const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-    }
-    
-    const createParticles = () => {
-      particles = []
-      const count = Math.floor((canvas.width * canvas.height) / 12000)
-      for (let i = 0; i < count; i++) {
-        const colorBase = colors[Math.floor(Math.random() * colors.length)]
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: (Math.random() - 0.5) * 0.3,
-          size: Math.random() * 2 + 0.5,
-          opacity: Math.random() * 0.4 + 0.1,
-          color: colorBase
-        })
-      }
-    }
-    
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      
-      particles.forEach((p, i) => {
-        p.x += p.vx
-        p.y += p.vy
-        
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1
-        
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        ctx.fillStyle = `${p.color} ${p.opacity})`
-        ctx.fill()
-        
-        // Draw connections
-        particles.slice(i + 1).forEach((p2) => {
-          const dx = p.x - p2.x
-          const dy = p.y - p2.y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          
-          if (dist < 120) {
-            ctx.beginPath()
-            ctx.moveTo(p.x, p.y)
-            ctx.lineTo(p2.x, p2.y)
-            ctx.strokeStyle = `rgba(14, 165, 233, ${0.08 * (1 - dist / 120)})`
-            ctx.stroke()
-          }
-        })
-      })
-      
-      animationId = requestAnimationFrame(draw)
-    }
-    
-    resize()
-    createParticles()
-    draw()
-    
-    window.addEventListener('resize', () => {
-      resize()
-      createParticles()
-    })
-    
-    return () => {
-      cancelAnimationFrame(animationId)
-    }
-  }, [])
-  
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 pointer-events-none"
-      style={{ opacity: 0.7 }}
-    />
-  )
 }
 
 // Service Card Component with 3D Effect
@@ -468,12 +364,6 @@ function TestimonialCard({ testimonial, index }: { testimonial: typeof testimoni
 
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false)
-  const { scrollYProgress } = useScroll()
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  })
   const { user: authUser } = useAuth()
   
   // 服务弹窗状态
@@ -633,20 +523,11 @@ ${serviceMsg}
 
   return (
     <main className="min-h-screen relative overflow-hidden">
-      {/* Progress Bar */}
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-accent-500 origin-left z-[100]"
-        style={{ scaleX }}
-      />
-      
-      {/* Background Effects */}
+      {/* Background Effects - 简化版本 */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-mesh" />
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary-500/20 rounded-full blur-[150px] animate-pulse" />
-        <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-accent-500/15 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-1/4 left-1/3 w-[450px] h-[450px] bg-primary-600/10 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '2s' }} />
-        <ParticleBackground />
-        <div className="absolute inset-0 grid-pattern opacity-50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#020617] via-[#0a0f2e] to-[#0f172a]" />
+        <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-primary-500/10 rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-accent-500/10 rounded-full blur-[120px]" />
       </div>
 
       {/* Navigation */}

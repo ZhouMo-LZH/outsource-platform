@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 interface User {
   id: string
@@ -21,12 +21,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const pathname = usePathname()
 
   // 初始化时检查登录状态 - 不阻塞渲染
   useEffect(() => {
+    // 只在客户端执行
+    if (typeof window === 'undefined') return
+    
     try {
       const token = localStorage.getItem('token')
       const userData = localStorage.getItem('user')
@@ -57,7 +59,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('初始化认证失败:', error)
     } finally {
-      // 立即结束 loading，不等待验证完成
       setLoading(false)
     }
   }, [])
@@ -66,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const verifyTokenInBackground = async (token: string): Promise<boolean> => {
     try {
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 3000) // 3秒超时
+      const timeoutId = setTimeout(() => controller.abort(), 3000)
       
       const res = await fetch('/api/auth/verify', {
         headers: {
