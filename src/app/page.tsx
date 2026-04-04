@@ -4,10 +4,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { 
-  Code, GraduationCap, Palette, Rocket, Shield, MessageCircle, 
-  ChevronRight, Star, Zap, ArrowRight, Sparkles,
-  Target, Heart, Mail, Phone, MapPin,
+import {
+  Code, GraduationCap, Palette, Rocket, Shield, MessageCircle,
+  ChevronRight, Star, Zap, ArrowRight, Sparkles, Cpu, Globe,
+  TrendingUp, Clock, Award, CheckCircle2, Users, Lightbulb,
+  Target, Heart, Mail, Phone, MapPin, Github, Twitter, Linkedin,
   X, Loader2, User
 } from 'lucide-react'
 import { useAuth } from '@/components/AuthProvider'

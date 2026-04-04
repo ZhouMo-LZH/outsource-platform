@@ -1,27 +1,14 @@
 'use client'
 
-import { useState, useEffect, createContext, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  LayoutDashboard, Users, MessageSquare, Package, Settings, 
+import {
+  LayoutDashboard, Users, MessageSquare, Package, Settings,
   LogOut, Menu, X, Bell, Search, ChevronDown, Layers,
   Loader2
 } from 'lucide-react'
-
-// 创建未读消息上下文
-interface UnreadContextType {
-  unreadCount: number
-  refreshUnreadCount: () => void
-}
-
-export const UnreadContext = createContext<UnreadContextType>({
-  unreadCount: 0,
-  refreshUnreadCount: () => {}
-})
-
-// Hook 用于获取未读消息数量
-export const useUnreadCount = () => useContext(UnreadContext)
+import { UnreadContext, useUnreadCount } from './UnreadContext'
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: '仪表盘', href: '/admin/dashboard' },

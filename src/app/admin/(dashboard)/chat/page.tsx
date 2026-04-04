@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Send, Search, MoreVertical, Phone, Video, Smile, Image, Paperclip, CheckCheck } from 'lucide-react'
-import { useUnreadCount } from '../layout'
+import { useUnreadCount } from '../UnreadContext'
 
 interface Message {
   id: string
