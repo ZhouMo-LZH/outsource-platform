@@ -765,7 +765,7 @@ ${serviceMsg}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/register" className="btn-primary group inline-flex items-center gap-2">
+              <Link href="#services" className="btn-primary group inline-flex items-center gap-2">
                 <span className="relative z-10 flex items-center gap-2">
                   立即开始
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
