@@ -23,37 +23,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
 
-  // 初始化时检查登录状态 - 不阻塞渲染
   useEffect(() => {
-    // 只在客户端执行
-    if (typeof window === 'undefined') return
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
     
     try {
+      if (typeof window === 'undefined') return
+      
       const token = localStorage.getItem('token')
       const userData = localStorage.getItem('user')
 
       if (token && userData) {
         try {
-          // 先解析本地数据，立即显示页面
           const parsedUser = JSON.parse(userData)
-          setUser(parsedUser)
           
-          // 后台验证 token（非阻塞）
-          verifyTokenInBackground(token).then(isValid => {
-            if (!isValid) {
-              // token 无效时清除数据
-              localStorage.removeItem('token')
-              localStorage.removeItem('user')
-              setUser(null)
-            }
-          }).catch(() => {
-            // 验证失败时保留本地数据，让用户可以继续使用
-          })
+          if (parsedUser && parsedUser.id && parsedUser.username) {
+            setUser(parsedUser)
+            
+            verifyTokenInBackground(token).then(isValid => {
+              if (!isValid && mounted) {
+                try {
+                  localStorage.removeItem('token')
+                  localStorage.removeItem('user')
+                  setUser(null)
+                } catch (e) {
+                  console.error('清除认证数据失败:', e)
+                }
+              }
+            }).catch(() => {
+            })
+          }
         } catch (e) {
           console.error('解析用户数据失败:', e)
-          localStorage.removeItem('token')
-          localStorage.removeItem('user')
+          try {
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
+          } catch (err) {
+            console.error('清除失败的数据失败:', err)
+          }
         }
       }
     } catch (error) {
@@ -61,9 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [mounted])
 
-  // 后台验证 token（不阻塞）
   const verifyTokenInBackground = async (token: string): Promise<boolean> => {
     try {
       const controller = new AbortController()
@@ -83,16 +94,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const login = (token: string, userData: User) => {
-    localStorage.setItem('token', token)
-    localStorage.setItem('user', JSON.stringify(userData))
-    setUser(userData)
+    try {
+      localStorage.setItem('token', token)
+      localStorage.setItem('user', JSON.stringify(userData))
+      setUser(userData)
+    } catch (error) {
+      console.error('登录保存数据失败:', error)
+    }
   }
 
   const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    setUser(null)
-    router.push('/login')
+    try {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      setUser(null)
+      router.push('/login')
+    } catch (error) {
+      console.error('登出失败:', error)
+    }
   }
 
   return (
@@ -105,7 +124,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    return {
+      user: null,
+      loading: false,
+      login: () => {},
+      logout: () => {}
+    }
   }
   return context
 }
