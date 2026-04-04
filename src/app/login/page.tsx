@@ -177,7 +177,7 @@ export default function LoginPage() {
       </Link>
 
       {/* Cute Character */}
-      <div className="absolute bottom-4 right-8 md:right-16 cursor-pointer z-20 select-none"
+      <div className="absolute bottom-4 left-8 md:left-16 cursor-pointer z-20 select-none"
            onClick={handleUmbrellaClick}>
         <div className="relative">
           <div className={`umbrella-animation glow-effect transition-all duration-500 ${umbrellaOpen ? 'opacity-100' : 'opacity-90'}`}>
