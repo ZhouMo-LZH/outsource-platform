@@ -767,20 +767,10 @@ ${serviceMsg}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link 
-                href={authUser ? "#services" : "/login"} 
-                className="btn-primary group inline-flex items-center gap-2"
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  {authUser ? '立即开始' : '登录 / 注册'}
-                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/chat" className="btn-secondary group inline-flex items-center gap-2">
+              <Link href="/chat" className="btn-primary group inline-flex items-center gap-2">
                 <MessageCircle className="w-5 h-5" />
                 在线咨询
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
           </motion.div>
