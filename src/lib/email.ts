@@ -1,22 +1,14 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
-function getResendClient() {
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    throw new Error('RESEND_API_KEY 环境变量未设置')
-  }
-  return new Resend(apiKey)
-}
-
-const EMAIL_FROM = process.env.EMAIL_FROM || 'onboarding@resend.dev'
-
-// 检查必要的配置
-function checkEmailConfig() {
-  if (!process.env.RESEND_API_KEY) {
-    return { valid: false, error: 'RESEND_API_KEY 未配置' }
-  }
-  return { valid: true }
-}
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.qq.com',
+  port: Number(process.env.SMTP_PORT) || 465,
+  secure: true,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+})
 
 function getVerificationEmailHtml(code: string, formattedDate: string) {
   return `
@@ -292,13 +284,6 @@ function getNotificationEmailHtml(subject: string, content: string, formattedDat
 }
 
 export async function sendVerificationEmail(email: string, code: string) {
-  // 检查配置
-  const configCheck = checkEmailConfig()
-  if (!configCheck.valid) {
-    console.error('邮件配置错误:', configCheck.error)
-    return { success: false, error: configCheck.error }
-  }
-
   const now = new Date()
   const formattedDate = now.toLocaleString('zh-CN', {
     year: 'numeric',
@@ -310,28 +295,18 @@ export async function sendVerificationEmail(email: string, code: string) {
     hour12: false
   })
 
-  console.log('正在发送邮件到:', email)
-  console.log('使用发件人:', EMAIL_FROM)
-
   try {
-    const { data, error } = await getResendClient().emails.send({
-      from: EMAIL_FROM,
+    await transporter.sendMail({
+      from: `"科技服务平台" <${process.env.SMTP_USER}>`,
       to: email,
       subject: '【科技服务平台】邮箱验证码',
       html: getVerificationEmailHtml(code, formattedDate),
     })
-
-    if (error) {
-      console.error('Resend 发送邮件失败:', JSON.stringify(error))
-      return { success: false, error: error.message || '邮件发送失败' }
-    }
-
-    console.log('邮件发送成功:', data)
-    return { success: true, data }
+    return { success: true }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error('发送邮件异常:', errorMessage, error)
-    return { success: false, error: errorMessage || '邮件发送异常' }
+    console.error('发送邮件失败:', errorMessage)
+    return { success: false, error: errorMessage }
   }
 }
 
@@ -348,23 +323,17 @@ export async function sendNotificationEmail(to: string, subject: string, content
   })
 
   try {
-    const { data, error } = await getResendClient().emails.send({
-      from: EMAIL_FROM,
+    await transporter.sendMail({
+      from: `"科技服务平台" <${process.env.SMTP_USER}>`,
       to,
       subject: `【科技服务平台】${subject}`,
       html: getNotificationEmailHtml(subject, content, formattedDate),
     })
-
-    if (error) {
-      console.error('Resend 发送通知邮件失败:', error)
-      return { success: false, error }
-    }
-
-    console.log('通知邮件发送成功:', data)
-    return { success: true, data }
+    return { success: true }
   } catch (error) {
-    console.error('发送通知邮件失败:', error)
-    return { success: false, error }
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('发送通知邮件失败:', errorMessage)
+    return { success: false, error: errorMessage }
   }
 }
 
