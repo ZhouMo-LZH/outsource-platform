@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
     const emailResult = await sendVerificationEmail(email, code)
     
     if (!emailResult.success) {
+      console.error('邮件发送失败详情:', emailResult.error)
       return NextResponse.json(
         { error: '验证码发送失败，请稍后重试' },
         { status: 500 }
