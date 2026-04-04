@@ -2,6 +2,7 @@ import { Resend } from 'resend'
 
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY
+  console.log('RESEND_API_KEY 前10位:', apiKey?.substring(0, 10) || '未设置')
   if (!apiKey) {
     throw new Error('RESEND_API_KEY 环境变量未设置')
   }
