@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, User, Lock, ArrowLeft, Sparkles } from 'lucide-react'
+import { useAuth } from '@/components/AuthProvider'
 
 interface RainDrop {
   id: number
@@ -15,6 +16,7 @@ interface RainDrop {
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [umbrellaOpen, setUmbrellaOpen] = useState(false)
   const [rainDrops, setRainDrops] = useState<RainDrop[]>([])
@@ -62,8 +64,7 @@ export default function LoginPage() {
       const data = await res.json()
       
       if (res.ok) {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
+        login(data.token, data.user)
         router.push('/')
       } else {
         setError(data.error || '登录失败')
