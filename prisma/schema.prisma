@@ -8,6 +8,9 @@ datasource db {
   relationMode = "prisma"
 }
 
+// TiDB Cloud SSL 配置
+// 在 Vercel 上使用 sslaccept=accept 代替证书路径
+
 model User {
   id            String    @id @default(cuid())
   username      String    @unique

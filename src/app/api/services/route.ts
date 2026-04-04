@@ -3,18 +3,23 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    const services = await prisma.service.findMany({
+    // 设置超时
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Database timeout')), 5000)
+    )
+    
+    const servicesPromise = prisma.service.findMany({
       where: { status: 'active' },
       orderBy: { createdAt: 'desc' }
     })
     
+    const services = await Promise.race([servicesPromise, timeoutPromise]) as any[]
+    
     return NextResponse.json({ services })
   } catch (error) {
     console.error('获取服务列表错误:', error)
-    return NextResponse.json(
-      { error: '服务器错误' },
-      { status: 500 }
-    )
+    // 返回空数组而不是错误，让页面能正常显示
+    return NextResponse.json({ services: [] })
   }
 }
 

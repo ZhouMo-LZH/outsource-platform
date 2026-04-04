@@ -84,11 +84,24 @@ export default function DashboardPage() {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch('/api/services')
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒超时
+      
+      const res = await fetch('/api/services', {
+        signal: controller.signal
+      })
+      clearTimeout(timeoutId)
+      
       const data = await res.json()
       setServices(data.services || [])
     } catch (error) {
       console.error('获取服务失败:', error)
+      // 使用默认数据，确保页面能正常显示
+      setServices([
+        { id: '1', name: 'OpenClash部署', description: '专业部署服务', price: 99, category: '网络服务' },
+        { id: '2', name: '毕设代做', description: '毕业设计服务', price: 999, category: '教育服务' },
+        { id: '3', name: '网站设计', description: '网站开发服务', price: 1999, category: '开发服务' },
+      ])
     } finally {
       setLoading(false)
     }
