@@ -11,6 +11,7 @@ import {
   Target, Heart, Mail, Phone, MapPin, Github, Twitter, Linkedin,
   X, Loader2, User
 } from 'lucide-react'
+import { useAuth } from '@/components/AuthProvider'
 
 const services = [
   {
@@ -474,6 +475,9 @@ export default function Home() {
     restDelta: 0.001
   })
   
+  // 使用 AuthProvider
+  const { user: authUser } = useAuth()
+  
   // 服务弹窗状态
   const [showServiceModal, setShowServiceModal] = useState(false)
   const [selectedService, setSelectedService] = useState<typeof services[0] | null>(null)
@@ -489,19 +493,17 @@ export default function Home() {
   
   useEffect(() => {
     setIsVisible(true)
-    // 获取用户信息
-    const userData = localStorage.getItem('user')
-    if (userData) {
-      const parsedUser = JSON.parse(userData)
-      setUser(parsedUser)
+    // 使用 AuthProvider 的用户信息
+    if (authUser) {
+      setUser(authUser)
       setOrderForm({
-        username: parsedUser.username || '',
-        email: parsedUser.email || '',
-        phone: parsedUser.phone || '',
+        username: authUser.username || '',
+        email: authUser.email || '',
+        phone: authUser.phone || '',
         remark: ''
       })
     }
-  }, [])
+  }, [authUser])
 
   // 服务消息模板 - 根据不同服务生成对应的提醒信息
   const getServiceMessage = (serviceTitle: string) => {
@@ -765,9 +767,12 @@ ${serviceMsg}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="#services" className="btn-primary group inline-flex items-center gap-2">
+              <Link 
+                href={authUser ? "#services" : "/login"} 
+                className="btn-primary group inline-flex items-center gap-2"
+              >
                 <span className="relative z-10 flex items-center gap-2">
-                  立即开始
+                  {authUser ? '立即开始' : '登录 / 注册'}
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
