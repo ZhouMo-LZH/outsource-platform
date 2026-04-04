@@ -25,11 +25,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
-  // 验证 token 是否有效（带超时）
-  const verifyToken = async (token: string): Promise<boolean> => {
+  // 初始化时检查登录状态 - 不阻塞渲染
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem('token')
+      const userData = localStorage.getItem('user')
+
+      if (token && userData) {
+        try {
+          // 先解析本地数据，立即显示页面
+          const parsedUser = JSON.parse(userData)
+          setUser(parsedUser)
+          
+          // 后台验证 token（非阻塞）
+          verifyTokenInBackground(token).then(isValid => {
+            if (!isValid) {
+              // token 无效时清除数据
+              localStorage.removeItem('token')
+              localStorage.removeItem('user')
+              setUser(null)
+            }
+          }).catch(() => {
+            // 验证失败时保留本地数据，让用户可以继续使用
+          })
+        } catch (e) {
+          console.error('解析用户数据失败:', e)
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+        }
+      }
+    } catch (error) {
+      console.error('初始化认证失败:', error)
+    } finally {
+      // 立即结束 loading，不等待验证完成
+      setLoading(false)
+    }
+  }, [])
+
+  // 后台验证 token（不阻塞）
+  const verifyTokenInBackground = async (token: string): Promise<boolean> => {
     try {
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5秒超时
+      const timeoutId = setTimeout(() => controller.abort(), 3000) // 3秒超时
       
       const res = await fetch('/api/auth/verify', {
         headers: {
@@ -43,42 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return false
     }
   }
-
-  // 初始化时检查登录状态
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        const token = localStorage.getItem('token')
-        const userData = localStorage.getItem('user')
-
-        if (token && userData) {
-          try {
-            // 验证 token 是否仍然有效
-            const isValid = await verifyToken(token)
-            
-            if (isValid) {
-              setUser(JSON.parse(userData))
-            } else {
-              // token 已过期，清除本地存储
-              localStorage.removeItem('token')
-              localStorage.removeItem('user')
-            }
-          } catch (verifyError) {
-            // 验证失败但不清除，可能是网络问题
-            console.log('Token 验证失败:', verifyError)
-            // 仍然使用本地数据，让用户可以访问
-            setUser(JSON.parse(userData))
-          }
-        }
-      } catch (error) {
-        console.error('初始化认证失败:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    initAuth()
-  }, [])
 
   const login = (token: string, userData: User) => {
     localStorage.setItem('token', token)

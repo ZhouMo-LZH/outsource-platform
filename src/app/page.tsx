@@ -474,8 +474,6 @@ export default function Home() {
     damping: 30,
     restDelta: 0.001
   })
-  
-  // 使用 AuthProvider
   const { user: authUser } = useAuth()
   
   // 服务弹窗状态
