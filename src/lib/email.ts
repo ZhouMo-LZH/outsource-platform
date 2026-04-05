@@ -13,7 +13,8 @@ const transporter = nodemailer.createTransport({
   },
   tls: {
     rejectUnauthorized: false
-  }
+  },
+  requireTLS: port === 587
 })
 
 function getVerificationEmailHtml(code: string, formattedDate: string) {

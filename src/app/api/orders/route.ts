@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { sendNotificationEmail } from '@/lib/email'
 
 // 获取订单列表（支持按用户ID筛选）
 export async function GET(request: NextRequest) {
@@ -158,6 +159,38 @@ export async function POST(request: NextRequest) {
         }
       }
     })
+
+    // 发送邮件通知给管理员
+    try {
+      const adminEmail = process.env.ADMIN_EMAIL || '2962938198@qq.com'
+      const emailSubject = `新订单通知：${service.name}`
+      const emailContent = `您收到一条新的服务咨询！
+
+服务项目：${service.name}
+订单编号：${order.id}
+
+客户信息：
+- 姓名：${contactInfo?.username || '未填写'}
+- 邮箱：${contactInfo?.email || '未填写'}
+- 电话：${contactInfo?.phone || '未填写'}
+
+备注信息：
+${contactInfo?.remark || '无'}
+
+提交时间：${new Date().toLocaleString('zh-CN')}
+
+请及时登录后台处理。`
+
+      console.log('准备发送邮件通知到:', adminEmail)
+      const emailResult = await sendNotificationEmail(adminEmail, emailSubject, emailContent)
+      console.log('邮件发送结果:', emailResult)
+      
+      if (!emailResult.success) {
+        console.error('发送订单通知邮件失败:', emailResult.error)
+      }
+    } catch (error) {
+      console.error('发送订单通知邮件异常:', error)
+    }
 
     return NextResponse.json({
       message: '订单创建成功',

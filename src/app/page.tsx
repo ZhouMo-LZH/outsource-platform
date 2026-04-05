@@ -75,6 +75,8 @@ export default function Home() {
         phone: authUser.phone || '',
         remark: ''
       })
+    } else {
+      setUser(null)
     }
   }, [authUser])
 

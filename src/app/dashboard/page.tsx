@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from '@/components/AuthProvider'
 import { 
   User, Package, MessageCircle, Settings, LogOut, 
   ChevronRight, Lock, Eye, EyeOff, X, CheckCircle,
@@ -52,6 +53,7 @@ const quickActions = [
 
 export default function DashboardPage() {
   const router = useRouter()
+  const { logout } = useAuth()
   const [user, setUser] = useState<{ id: string; username: string; email: string } | null>(null)
   const [services, setServices] = useState<Service[]>([])
   const [orders, setOrders] = useState<Order[]>([])
@@ -108,14 +110,12 @@ export default function DashboardPage() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    logout()
     router.push('/')
   }
 
   const handleSwitchAccount = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    logout()
     router.push('/login')
   }
 

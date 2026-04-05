@@ -53,7 +53,8 @@ export default function AdminDashboardLayout({
   // 发送心跳报告在线状态
   const sendHeartbeat = async () => {
     const adminData = localStorage.getItem('admin')
-    if (adminData) {
+    const adminToken = localStorage.getItem('adminToken')
+    if (adminData && adminToken) {
       try {
         const parsed = JSON.parse(adminData)
         await fetch('/api/admin/status', {

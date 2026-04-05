@@ -56,7 +56,7 @@ export default function ChatPage() {
     
     const statusInterval = setInterval(() => {
       checkAdminStatus()
-    }, 10000)
+    }, 5000)
     
     return () => {
       clearInterval(heartbeatInterval)
@@ -203,12 +203,10 @@ export default function ChatPage() {
           <div>
             <h1 className="font-bold text-white">在线客服</h1>
             <div className="flex items-center gap-1.5">
-              {adminOnline && (
-                <>
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                  <span className="text-xs text-green-400">在线</span>
-                </>
-              )}
+              <span className={`w-2 h-2 rounded-full animate-pulse ${adminOnline ? 'bg-green-500' : 'bg-gray-500'}`}></span>
+              <span className={`text-xs ${adminOnline ? 'text-green-400' : 'text-gray-400'}`}>
+                {adminOnline ? '在线' : '离线'}
+              </span>
             </div>
           </div>
         </div>
