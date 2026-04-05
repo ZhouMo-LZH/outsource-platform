@@ -227,19 +227,24 @@ export default function RegisterPage() {
               />
             </div>
 
-            {/* Email */}
+            {/* QQ Email */}
             <div className="relative group">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-accent-400 transition-colors" />
               <input
-                type="email"
-                placeholder="邮箱地址"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 
+                type="text"
+                placeholder="QQ号码"
+                value={formData.email.replace('@qq.com', '')}
+                onChange={(e) => {
+                  const qqNumber = e.target.value.replace(/\D/g, '')
+                  setFormData({ ...formData, email: qqNumber ? `${qqNumber}@qq.com` : '' })
+                }}
+                className="w-full pl-12 pr-24 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 
                          focus:border-accent-400 focus:bg-white/10 focus:shadow-[0_0_20px_rgba(168,85,247,0.2)] transition-all outline-none"
                 required
               />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@qq.com</span>
             </div>
+            <p className="text-xs text-gray-500 -mt-2 ml-1">目前仅支持QQ邮箱注册</p>
 
             {/* Verification Code */}
             <div className="flex gap-3">
