@@ -162,7 +162,7 @@ export default function Home() {
               </Link>
 
               {user ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingLeft: '12px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+                <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingLeft: '12px', borderLeft: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none', cursor: 'pointer' }}>
                   <div style={{
                     width: '32px',
                     height: '32px',
@@ -178,7 +178,7 @@ export default function Home() {
                     {user.username[0].toUpperCase()}
                   </div>
                   <span style={{ color: '#d1d5db', fontSize: '14px' }}>{user.username}</span>
-                </div>
+                </Link>
               ) : (
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <Link href="/login" style={{ padding: '8px 16px', color: '#d1d5db', textDecoration: 'none', fontSize: '14px' }}>登录</Link>
