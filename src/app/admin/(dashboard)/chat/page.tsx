@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Send, Search, MoreVertical, Phone, Video, Smile, Image, Paperclip, CheckCheck } from 'lucide-react'
+import { Send, Search, MoreVertical, Phone, Video, Smile, Image, Paperclip, CheckCheck, Circle } from 'lucide-react'
 import { useUnreadCount } from '../UnreadContext'
 
 interface Message {
@@ -19,6 +19,7 @@ interface ChatSession {
   lastMessage: string
   unreadCount: number
   messages: Message[]
+  isOnline?: boolean
 }
 
 export default function AdminChatPage() {
@@ -35,10 +36,15 @@ export default function AdminChatPage() {
       const res = await fetch('/api/messages')
       const data = await res.json()
       if (data.sessions) {
+        const onlineRes = await fetch('/api/admin/status')
+        const onlineData = await onlineRes.json()
+        const onlineUsers = onlineData.onlineUsers || []
+        
         setSessions(data.sessions.map((s: ChatSession) => ({
           ...s,
           lastMessage: s.messages?.[0]?.content || '暂无消息',
-          unreadCount: s.messages?.filter((m: Message) => !m.isRead && m.sender === 'user').length || 0
+          unreadCount: s.messages?.filter((m: Message) => !m.isRead && m.sender === 'user').length || 0,
+          isOnline: onlineUsers.includes(s.id)
         })))
       }
     } catch (error) {
@@ -50,7 +56,7 @@ export default function AdminChatPage() {
 
   useEffect(() => {
     fetchSessions()
-    const interval = setInterval(fetchSessions, 5000)
+    const interval = setInterval(fetchSessions, 3000)
     return () => clearInterval(interval)
   }, [fetchSessions])
 
@@ -97,6 +103,8 @@ export default function AdminChatPage() {
       } : null)
 
       setInput('')
+      
+      refreshUnreadCount()
     } catch (error) {
       console.error('发送失败:', error)
     }
@@ -186,6 +194,9 @@ export default function AdminChatPage() {
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium">
                     {session.username[0].toUpperCase()}
                   </div>
+                  {session.isOnline && (
+                    <Circle className="absolute bottom-0 right-0 w-4 h-4 text-green-500 fill-green-500" />
+                  )}
                   {session.unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 min-w-5 h-5 bg-red-500 rounded-full text-xs text-white flex items-center justify-center px-1">
                       {session.unreadCount > 99 ? '99+' : session.unreadCount}

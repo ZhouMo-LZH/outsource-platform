@@ -6,7 +6,7 @@ import Link from 'next/link'
 import {
   LayoutDashboard, Users, MessageSquare, Package, Settings,
   LogOut, Menu, X, Bell, Search, ChevronDown, Layers,
-  Loader2
+  Loader2, User, RefreshCw
 } from 'lucide-react'
 import { UnreadContext, useUnreadCount } from './UnreadContext'
 
@@ -30,6 +30,7 @@ export default function AdminDashboardLayout({
   const [admin, setAdmin] = useState<{ username: string } | null>(null)
   const [loading, setLoading] = useState(true)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
 
   // 获取未读消息数量
   const fetchUnreadCount = async () => {
@@ -212,12 +213,64 @@ export default function AdminDashboardLayout({
                 )}
               </Link>
               
-              <div className="flex items-center gap-2 cursor-pointer">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                  <span className="text-xs text-white font-medium">{admin.username[0]}</span>
-                </div>
-                <span className="text-sm text-gray-300">{admin.username}</span>
-                <ChevronDown className="w-4 h-4 text-gray-400" />
+              <div className="relative">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-2 cursor-pointer hover:bg-white/5 rounded-lg px-2 py-1 transition-colors"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                    <span className="text-xs text-white font-medium">{admin.username[0]}</span>
+                  </div>
+                  <span className="text-sm text-gray-300">{admin.username}</span>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {dropdownOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setDropdownOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-slate-800 border border-white/10 rounded-xl shadow-xl z-20 overflow-hidden">
+                      <div className="p-3 border-b border-white/5">
+                        <p className="text-sm text-white font-medium">{admin.username}</p>
+                        <p className="text-xs text-gray-500">管理员</p>
+                      </div>
+                      <div className="p-2">
+                        <button
+                          onClick={() => {
+                            fetchUnreadCount()
+                            setDropdownOpen(false)
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition-colors"
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                          刷新数据
+                        </button>
+                        <button
+                          onClick={() => {
+                            setDropdownOpen(false)
+                            router.push('/admin/dashboard')
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition-colors"
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          仪表盘
+                        </button>
+                        <button
+                          onClick={() => {
+                            setDropdownOpen(false)
+                            logoutAndClearStatus()
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          退出登录
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </header>

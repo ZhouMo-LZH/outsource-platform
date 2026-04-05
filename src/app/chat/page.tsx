@@ -29,20 +29,39 @@ export default function ChatPage() {
       setUser(parsed)
       fetchMessages(parsed.id)
       checkAdminStatus()
+      sendUserHeartbeat(parsed.id)
     } else {
       setLoading(false)
     }
   }, [])
 
-  // 定期检查客服在线状态
+  const sendUserHeartbeat = async (userId: string) => {
+    try {
+      await fetch('/api/admin/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      })
+    } catch (error) {
+      console.error('发送心跳失败:', error)
+    }
+  }
+
   useEffect(() => {
     if (!user) return
     
-    const interval = setInterval(() => {
-      checkAdminStatus()
-    }, 10000) // 每10秒检查一次
+    const heartbeatInterval = setInterval(() => {
+      sendUserHeartbeat(user.id)
+    }, 30000)
     
-    return () => clearInterval(interval)
+    const statusInterval = setInterval(() => {
+      checkAdminStatus()
+    }, 10000)
+    
+    return () => {
+      clearInterval(heartbeatInterval)
+      clearInterval(statusInterval)
+    }
   }, [user])
 
   const checkAdminStatus = async () => {
