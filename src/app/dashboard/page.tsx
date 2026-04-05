@@ -113,6 +113,12 @@ export default function DashboardPage() {
     router.push('/')
   }
 
+  const handleSwitchAccount = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    router.push('/login')
+  }
+
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -261,10 +267,21 @@ export default function DashboardPage() {
                   ))}
                 </nav>
 
+                {/* Switch Account */}
+                <button
+                  onClick={handleSwitchAccount}
+                  className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-blue-400 hover:bg-blue-500/10 transition-all mt-6"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <span className="text-base">切换账号</span>
+                </button>
+
                 {/* Logout */}
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-all mt-6"
+                  className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-all mt-2"
                 >
                   <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
                     <LogOut className="w-5 h-5" />
