@@ -98,6 +98,53 @@ export async function sendVerificationEmail(email: string, code: string) {
   }
 }
 
+export async function sendNotificationEmail(to: string, subject: string, content: string) {
+  const now = new Date()
+  const formattedDate = now.toLocaleString('zh-CN')
+
+  // 检查配置
+  if (!SMTP_USER || !SMTP_PASS) {
+    console.error('通知邮件发送失败: 环境变量未设置')
+    return { success: false, error: '服务器配置错误: SMTP 未配置' }
+  }
+
+  try {
+    console.log('开始发送通知邮件到:', to)
+    
+    const result = await transporter.sendMail({
+      from: `"周末平台" <${SMTP_USER}>`,
+      to,
+      subject: `【周末平台】${subject}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>${subject}</title>
+        </head>
+        <body style="margin: 0; padding: 40px; background: #f5f5f5; font-family: Arial, sans-serif;">
+          <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; padding: 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h1 style="color: #333; text-align: center;">周末平台</h1>
+            <h2 style="color: #4f46e5; text-align: center;">${subject}</h2>
+            <div style="padding: 20px; background: #f9f9f9; border-radius: 8px; margin: 20px 0;">
+              <p style="color: #666; white-space: pre-wrap;">${content}</p>
+            </div>
+            <p style="color: #ccc; text-align: center; font-size: 12px; margin-top: 30px;">发送时间: ${formattedDate}</p>
+          </div>
+        </body>
+        </html>
+      `,
+    })
+    
+    console.log('通知邮件发送成功:', result.messageId)
+    return { success: true }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('发送通知邮件失败:', errorMessage)
+    return { success: false, error: errorMessage }
+  }
+}
+
 export function generateCode(length: number): string {
   const chars = '0123456789'
   let code = ''
