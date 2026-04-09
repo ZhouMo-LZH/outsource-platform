@@ -1,13 +1,14 @@
 [build]
-  command = "prisma generate && next build"
+  command = "npm run build"
   publish = ".next"
+  functions = ".netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
-  NPM_VERSION = "9"
 
+# Next.js 需要设置为 standalone 输出模式
+# 已在 next.config.js 中配置 output: "standalone"
+
+# Netlify Functions 配置
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-[functions]
-  directory = "netlify/functions"
