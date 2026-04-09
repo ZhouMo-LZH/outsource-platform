@@ -25,6 +25,8 @@ model User {
   updatedAt     DateTime  @updatedAt
   orders        Order[]
   messages      Message[]
+  reviews       Review[]
+  notifications Notification[]
 }
 
 model Admin {
@@ -84,4 +86,43 @@ model VerificationCode {
   used      Boolean  @default(false)
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+// 评价系统
+model Review {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  serviceId   String?
+  orderId     String?
+  rating      Int       // 1-5 星级评分
+  title       String?   // 评价标题
+  content     String    // 评价内容
+  isVerified  Boolean   @default(false) // 是否已验证（购买后评价）
+  status      String    @default("pending") // pending, approved, rejected, hidden
+  likes       Int       @default(0) // 点赞数
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([serviceId])
+  @@index([status])
+}
+
+// 通知系统
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   // order, message, system, review
+  title       String
+  content     String?
+  data        String?  // JSON 格式的额外数据（如订单ID等）
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
 }
